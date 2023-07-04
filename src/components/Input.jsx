@@ -13,6 +13,7 @@ import {
 import { db, storage } from "../firebase";
 import { v4 as uuid } from "uuid";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import crypto from 'crypto-js'
 
 const Input = () => {
   const [text, setText] = useState("");
@@ -22,6 +23,9 @@ const Input = () => {
   const { data } = useContext(ChatContext);
 
   const handleSend = async () => {
+
+    const encryptedMessage = crypto.AES.encrypt(text, process.env.REACT_APP_PUBLIC_KEY).toString();
+
     if (img) {
       const storageRef = ref(storage, uuid());
 
@@ -36,7 +40,7 @@ const Input = () => {
             await updateDoc(doc(db, "chats", data.chatId), {
               messages: arrayUnion({
                 id: uuid(),
-                text,
+                text: encryptedMessage,
                 senderId: currentUser.uid,
                 date: Timestamp.now(),
                 img: downloadURL,
@@ -49,7 +53,7 @@ const Input = () => {
       await updateDoc(doc(db, "chats", data.chatId), {
         messages: arrayUnion({
           id: uuid(),
-          text,
+          text: encryptedMessage,
           senderId: currentUser.uid,
           date: Timestamp.now(),
         }),
@@ -58,14 +62,14 @@ const Input = () => {
 
     await updateDoc(doc(db, "userChats", currentUser.uid), {
       [data.chatId + ".lastMessage"]: {
-        text,
+        text: encryptedMessage,
       },
       [data.chatId + ".date"]: serverTimestamp(),
     });
 
     await updateDoc(doc(db, "userChats", data.user.uid), {
       [data.chatId + ".lastMessage"]: {
-        text,
+        text: encryptedMessage,
       },
       [data.chatId + ".date"]: serverTimestamp(),
     });

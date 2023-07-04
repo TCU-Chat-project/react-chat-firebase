@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { ChatContext } from "../context/ChatContext";
+import { decodeMessage } from "../utils";
 
 const Message = ({ message }) => {
   const { currentUser } = useContext(AuthContext);
@@ -29,7 +30,7 @@ const Message = ({ message }) => {
         <span>just now</span>
       </div>
       <div className="messageContent">
-        <p>{message.text}</p>
+        <p>{decodeMessage(message.text)}</p>
         {message.img && <img src={message.img} alt="" />}
       </div>
     </div>

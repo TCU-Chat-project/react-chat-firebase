@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { ChatContext } from "../context/ChatContext";
 import { db } from "../firebase";
+import { decodeMessage } from "../utils";
 
 const Chats = () => {
   const [chats, setChats] = useState([]);
@@ -39,7 +40,7 @@ const Chats = () => {
           <img src={chat[1].userInfo.photoURL} alt="" />
           <div className="userChatInfo">
             <span>{chat[1].userInfo.displayName}</span>
-            <p>{chat[1].lastMessage?.text}</p>
+            <p>{decodeMessage(chat[1].lastMessage?.text)}</p>
           </div>
         </div>
       ))}
